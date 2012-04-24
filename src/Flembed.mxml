@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   creationComplete="init()"
+					   width="1000" height="750" xmlns:dragdrop="dragdrop.*" xmlns:preview="preview.*" xmlns:comps="comps.*" xmlns:debugger="com.demonsters.debugger.*">
+	<fx:Style source="styles/styles.css"/>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace dragdrop "dragdrop.*";
+		@namespace preview "preview.*";
+		@namespace comps "comps.*";
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import control.StoredData;
+			
+			import dragdrop.DragDropManager;
+			
+			import events.SettingsEvent;
+			
+			import filegeneration.FileGenerator;
+			
+			import flashx.textLayout.formats.LineBreak;
+			
+			import model.Model;
+			
+			import spark.filters.GlowFilter;
+			
+			private var _dragdrop : DragDropManager;
+
+			private function init():void
+			{
+				Model.getInstance().addEventListener(SettingsEvent.SETTINGS_UPDATED, onSettingsUpdated);
+				
+				//Load default application settings
+				StoredData.loadDefaults();
+				
+				htmlPreview.htmlLoader.placeLoadStringContentInApplicationSandbox = true;
+				
+				var menu : ContextMenu = new ContextMenu();
+				menu.removeAllItems();
+				menu.customItems = [new ContextMenuItem("Flembed by Simon Altschuler")];
+				contextMenu = menu;
+
+				_dragdrop = new DragDropManager([HTMLPreviewView, fileOptions.filesList, this]);
+				
+				update();
+			}
+
+			private function onSettingsUpdated(event:SettingsEvent):void
+			{
+				update();
+			}
+			
+			private function update():void
+			{
+				htmlPreview.htmlLoader.loadString(Model.getInstance().getPreviewHTML());
+				htmlSource.text = Model.getInstance().getHTML();
+				
+				//TODO: databind this
+				beginMessage.visible = Model.getInstance().isEmpty();
+			}
+			
+			protected function buttonViewMode_clickHandler(event:MouseEvent):void
+			{
+				//Toggle between source and preview
+				if (htmlViewstack.selectedIndex == 0)
+				{
+					htmlViewstack.selectedIndex = 1;
+					buttonViewMode.label = "View preview";
+				}
+				else
+				{
+					htmlViewstack.selectedIndex = 0;
+					buttonViewMode.label = "View source";
+				}
+			}
+		]]>
+	</fx:Script>
+	<s:TabBar x="10" y="10" height="30" width="260" dataProvider="{optionsViewstack}"/>
+	<s:BorderContainer width="260" bottom="40" top="40" left="10">
+		<mx:ViewStack id="optionsViewstack" width="250" height="608" x="5" y="5">
+			<s:NavigatorContent width="250" height="100%" id="filesContent" label="Files">
+				
+				<comps:FileOptions id="fileOptions" filesChanged="update()"/>
+				
+			</s:NavigatorContent>
+			<s:NavigatorContent width="250" height="100%" id="outputContent" label="Settings" >
+				
+				<comps:OutputOptions id="outputter" width="250"/>
+				
+			</s:NavigatorContent>
+		</mx:ViewStack>
+	</s:BorderContainer>
+	<mx:ViewStack id="htmlViewstack" left="280" top="40" right="10" bottom="40" creationPolicy="all">
+		<s:NavigatorContent id="HTMLPreviewView" label="HTML Preview">
+			<s:VGroup gap="0" width="100%" height="100%">
+				<comps:WindowFrameTop width="100%" />
+
+				<s:BorderContainer width="100%" height="100%" borderVisible="true" borderColor="#727272" borderWeight="1">
+					<mx:HTML id="htmlPreview" width="100%" height="100%" x="0" y="0"/>
+					<s:BorderContainer id="beginMessage" cornerRadius="5" contentBackgroundColor="#000000" width="300" height="50" verticalCenter="0" horizontalCenter="0">
+						<s:Label text="Drop .swf or image files here to begin." verticalCenter="0" horizontalCenter="0" color="#FFFFFF" fontSize="15"/>
+					</s:BorderContainer>
+				</s:BorderContainer>
+				
+			</s:VGroup>
+		</s:NavigatorContent>	
+		<s:NavigatorContent id="HTMLSourceView" label="HTML Source">
+			<s:VGroup height="100%" width="100%">
+				
+				<s:TextArea id="htmlSource" width="100%" lineBreak="{LineBreak.EXPLICIT}" height="80%" x="0" y="0"/>
+				<s:Label text="Alternative content"/>
+				<s:TextArea id="htmlAlternativeContent" text="@{Model.getInstance().alternativeContent}" width="100%" height="20%" x="0" y="0"/>
+			
+			</s:VGroup>
+		</s:NavigatorContent>	
+	</mx:ViewStack>
+
+	<s:BorderContainer right="0" left="0" bottom="0" height="30" backgroundColor="#777777" id="bottomBar">
+		<s:HGroup top="4" width="100%" horizontalCenter="0" horizontalAlign="center">
+			<!--<s:Label paddingTop="5" paddingLeft="6" text="PROJECT TITLE:" color="#000000" fontSize="14"/>
+			<s:TextInput width="200" id="projectTitleInput" text="@{Model.getInstance().projectTitle}"/>-->
+			
+			<s:Button color="#00FF00" label="Generate" x="400" width="150" fontSize="15" height="20" id="generateButton" click="FileGenerator.startGeneration();"/>
+			<s:Button color="#00BB00" label="Set current settings as default" width="200" fontSize="13" height="20" id="setAsDefaultButton" click="StoredData.setDefaults();"/>
+		</s:HGroup>
+	</s:BorderContainer>
+	
+	<s:Label x="280" y="10" width="710" height="22" verticalAlign="middle" textAlign="center" fontSize="20" text="Output"/>
+	
+	<s:Button click="buttonViewMode_clickHandler(event)" label="View source" id="buttonViewMode" right="10" top="10"/>
+</s:WindowedApplication>

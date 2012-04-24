@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" height="800" width="100%">
+	<fx:Declarations>
+		<s:RadioButtonGroup id="radioGroup"/>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import assets.AssetsManager;
+			import assets.HTMLTemplate;
+			
+			import flash.net.navigateToURL;
+			
+			import model.FileInfo;
+			import model.Flashvar;
+			import model.Model;
+			
+			import mx.collections.ArrayList;
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.graphics.SolidColorStroke;
+			
+			import nochump.util.zip.ZipEntry;
+			import nochump.util.zip.ZipOutput;
+			
+			import spark.components.RadioButtonGroup;
+			
+			import zip.Zipper;
+			
+			protected function addNewFlashvarButton_clickHandler(event:MouseEvent):void
+			{
+				Model.getInstance().flashvars.addItem(new Flashvar("name", "value"));
+				
+				Model.getInstance().notify();
+			}
+
+			protected function removeFlashvarButton_clickHandler(event:MouseEvent):void
+			{
+				if (flashvarsList.selectedIndex != -1)
+				{
+					Model.getInstance().flashvars.removeItemAt(flashvarsList.selectedIndex);
+					Model.getInstance().notify();
+				}
+			}
+			
+			protected function pageTitleInput_changeHandler(e:FocusEvent):void
+			{
+				Model.getInstance().pageTitle = pageTitleInput.text;
+				
+				Model.getInstance().notify();
+			}
+		]]>
+	</fx:Script>
+
+	<s:VGroup height="100%" width="250">
+		<s:Label text="APPEARANCE" width="100%" height="17" styleName="settingsHeader"/>
+		<s:Line stroke="{new SolidColorStroke(0xFFFFFF, 1, .3)}" xFrom="0" yFrom="0" xTo="10" yTo="0" width="100%" />
+		<s:Label text="Page title" styleName="h3"/>
+		<s:TextInput width="100%" id="pageTitleInput" focusOut="pageTitleInput_changeHandler(event)" toolTip="{Model.getInstance().getToolTip('page_title')}"/>
+		<s:Label text="Colors" paddingTop="10" styleName="h3"/>
+		<s:HGroup width="200" verticalAlign="middle">
+			<mx:ColorPicker selectedColor="@{Model.getInstance().backgroundColor}" id="colorBackground"/>
+			<s:Label text="Background color"/>
+		</s:HGroup>
+		<s:HGroup width="200" verticalAlign="middle">
+			<mx:ColorPicker id="colorText" selectedColor="@{Model.getInstance().textColor}"/>
+			<s:Label text="Text color"/>
+		</s:HGroup>
+		
+
+		<s:Label text="FLASHVARS" width="100%" height="17" styleName="settingsHeader" fontFamily="Arial"/>
+		<s:Line stroke="{new SolidColorStroke(0xFFFFFF, 1, .3)}" xFrom="0" yFrom="0" xTo="10" yTo="0" width="100%" />
+		<mx:DataGrid editable="true" itemFocusOut="Model.getInstance().notify()" dataChange="Model.getInstance().notify()" height="107" width="100%" id="flashvarsList" dataProvider="{Model.getInstance().flashvars}">
+			<mx:columns>
+				<mx:DataGridColumn headerText="Name" dataField="name"/>
+				<mx:DataGridColumn headerText="Value" dataField="value"/>
+			</mx:columns>
+		</mx:DataGrid>
+		<s:HGroup width="100%">
+			<s:Button label="+" id="addNewFlashvarButton" click="addNewFlashvarButton_clickHandler(event)" width="31" fontSize="15"/>
+			<s:Button label="-" id="removeFlashvarButton" click="removeFlashvarButton_clickHandler(event)" width="31" fontSize="15"/>
+		</s:HGroup>
+		
+		<s:Label text="EMBEDDING" width="100%" height="17" styleName="settingsHeader"/>
+		<s:Line stroke="{new SolidColorStroke(0xFFFFFF, 1, .3)}" xFrom="0" yFrom="0" xTo="10" yTo="0" width="100%" />
+		<s:Label text="Required Flash Player version" styleName="h3"/>
+		<s:DropDownList dataProvider="{Model.getInstance().rfpvs}" change="Model.getInstance().notify()" width="100%" selectedItem="@{Model.getInstance().rfpv}"/>
+		
+		<s:Label text="DOCTYPE declaration" styleName="h3"/>
+		<s:DropDownList enabled="{!Model.getInstance().html5Embed}" id="comboDoctype" dataProvider="{Model.getInstance().docTypes}" change="Model.getInstance().notify()" selectedItem="@{Model.getInstance().docType}" width="100%"/>
+		<s:Label text="Charset encoding" styleName="h3"/>
+		<s:DropDownList enabled="true" id="comboCharset" dataProvider="{Model.getInstance().charsets}" change="Model.getInstance().notify()" selectedItem="@{Model.getInstance().charset}" width="100%"/>
+		<s:CheckBox label="Include swfobject.js in HTML" id="checkboxZip" selected="@{Model.getInstance().includeSO}" toolTip="{Model.getInstance().getToolTip('include_swfobject')}"/>
+		<s:CheckBox label="HTML5 embedding" id="html5Embed" selected="@{Model.getInstance().html5Embed}" toolTip="{Model.getInstance().getToolTip('html5_embedding')}"/>
+		<s:CheckBox label="Express Install" id="expressInstall" selected="@{Model.getInstance().expressInstall}" toolTip="{Model.getInstance().getToolTip('express_install')}"/>
+
+		<!--DISABLED-->
+		<s:Label text="SWFObject version" styleName="h3" visible="false"/>
+		<s:RadioButton label="1.5" value="{HTMLTemplate.SWF_OBJECT_1_5}" id="radio1" group="{radioGroup}" visible="false"/>
+		<s:RadioButton label="2" value="{HTMLTemplate.SWF_OBJECT_2}" id="radio2" group="{radioGroup}" selected="true" visible="false"/>
+	</s:VGroup>
+</s:Group>

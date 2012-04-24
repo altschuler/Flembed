@@ -1,0 +1,7 @@
+.sourceMate
+.settings/
+.project
+.flexProperties
+.DS_Store
+.buildpath
+.actionScriptProperties

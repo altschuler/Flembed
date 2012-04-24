@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="true" width="100%" height="40" textAlign="left" implements="mx.controls.listClasses.IListItemRenderer">
+	<s:layout>
+		<s:HorizontalLayout gap="3"/>
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import assets.AssetsManager;
+			
+			import events.FileEvent;
+			
+			import model.FileInfo;
+			import model.Model;
+			
+			import mx.controls.listClasses.IListItemRenderer;
+			
+			private var _fileinfo : FileInfo;
+			
+			override public function set data(value:Object):void
+			{
+				_fileinfo = value as FileInfo;
+				if (_fileinfo)
+				{
+					iconBitmap.source = AssetsManager.getIconFromExtension((value as FileInfo).file.extension);
+					filenameLabel.text = (value as FileInfo).file.name;
+					titleLabel.text = (value as FileInfo).title == "" ? "<no title>" : (value as FileInfo).title;
+				}
+			}
+			
+			public function set icon(value : Object):void
+			{
+				iconBitmap.source = value;
+			}
+
+			protected function deleteBitmap_clickHandler(event:MouseEvent):void
+			{	
+				dispatchEvent(new FileEvent(FileEvent.FILE_DELETED, _fileinfo));
+			}
+		]]>
+	</fx:Script>
+	<s:HGroup gap="0" verticalAlign="contentJustify" width="100%" height="100%">
+		<mx:Image id="iconBitmap" width="40" height="40" scaleContent="false" verticalAlign="middle" horizontalAlign="center"/>
+		<s:VGroup width="100%" height="36" gap="0" paddingTop="4">
+			<s:Label id="filenameLabel" maxDisplayedLines="1" width="100%" visible="true"  text="Filename.swf" height="18" verticalAlign="middle" fontWeight="bold" fontSize="13"/>
+			<s:Label id="titleLabel" maxDisplayedLines="1" width="100%" visible="true"  text="Filename.swf" height="18" color="#868686" paddingLeft="10"/>
+		</s:VGroup>
+	</s:HGroup>
+</s:ItemRenderer>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="21">
+	<fx:Script>
+		<![CDATA[
+			import assets.AssetsManager;
+			
+			import model.Model;
+		]]>
+	</fx:Script>
+	
+		<mx:Image source="{AssetsManager.MAC_WINDOW_LEFT}" width="70" height="22"/>
+		<mx:Image id="frameCenter" left="70" right="16" height="22" maintainAspectRatio="false" scaleContent="true" source="{AssetsManager.MAC_WINDOW_CENTER}"/>
+		<mx:Image source="{AssetsManager.MAC_WINDOW_RIGHT}" y="0" right="0" width="16" height="22"/>
+		<s:TextInput text="@{Model.getInstance().pageTitle}" horizontalCenter="0" top="6" color="#000000" fontSize="12" skinClass="skins.TextInputSimpleSkin"/>
+		
+	
+</s:Group>

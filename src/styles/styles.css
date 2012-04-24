@@ -1,0 +1,41 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+
+s|WindowedApplication, 
+s|BorderContainer,
+mx|ViewStack
+{
+	background-color:#333333;
+}
+
+s|Label
+{
+	color:#CCCCCC;
+}
+
+s|Label.settingsHeader
+{
+	fontSize: 16;
+/*	background-color: #666699;*/
+	padding-top:5;
+	padding-bottom:5;
+	text-align:center;
+}
+
+s|Label.h1
+{
+	fontSize: 20;
+}
+
+s|Label.h2
+{
+	fontSize: 16;
+}
+
+s|Label.h3
+{
+	fontSize: 13;
+}
+	
